@@ -36,7 +36,7 @@ jobs:
       - name: Mypy (strict)
         run: mypy
       - name: Tests with coverage
-        run: pytest --cov=playbooks --cov-report=term-missing --cov-fail-under=85
+        run: pytest --cov=src/playbooks --cov-report=term-missing --cov-fail-under=85
 
   example:
     name: Example playbooks, drills and generated files

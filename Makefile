@@ -4,7 +4,7 @@ install:
 	python -m venv .venv && .venv/bin/pip install -e ".[dev]"
 
 check:
-	ruff check . && ruff format --check . && mypy && pytest --cov=playbooks --cov-fail-under=85
+	ruff check . && ruff format --check . && mypy && pytest --cov=src/playbooks --cov-fail-under=85
 
 test:
 	pytest
