@@ -1,0 +1,34 @@
+# The incident was declared sev3, but an agent acted on its own and money was lost. The plan must
+# be run at sev1, so credentials that are not yet revoked are already overdue at thirty minutes.
+id = "drill-002"
+title = "An understated severity is raised by the facts"
+kind = "unauthorised_action"
+playbook = "pb-unauthorised-action"
+declared_at = 2026-11-02T14:00:00Z
+aware_at = 2026-11-02T13:55:00Z
+declared_severity = "sev3"
+at = 2026-11-02T14:30:00Z
+note = "Declared three levels too low."
+
+[facts]
+autonomous_action = true
+harm = "financial"
+
+[[events]]
+at = 2026-11-02T14:10:00Z
+kind = "ack"
+by = "person-a"
+
+[[events]]
+at = 2026-11-02T14:10:00Z
+step = "confirm-action"
+by = "person-b"
+evidence = "agent log"
+
+[expect]
+severity = "sev1"
+overdue_steps = ["revoke-agent-access"]
+overdue_obligations = []
+done_steps = ["confirm-action"]
+update_overdue = false
+ack_overdue = false

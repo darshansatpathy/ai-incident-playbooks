@@ -1,0 +1,56 @@
+id = "pb-vendor-outage"
+title = "A model provider or AI vendor is down or degraded"
+applies_to = ["vendor_outage"]
+
+[[steps]]
+id = "confirm-outage"
+phase = "detect"
+role = "engineering-lead"
+action = "Confirm it is the provider and not us, and record the symptoms."
+due = { sev1 = 15, sev2 = 60, sev3 = 240, sev4 = 1440 }
+evidence = "log"
+
+[[steps]]
+id = "switch-to-fallback"
+phase = "contain"
+role = "engineering-lead"
+action = "Switch to the fallback provider, a cached answer or a plain error, whichever is safe."
+due = { sev1 = 20, sev2 = 90, sev3 = 480, sev4 = 2880 }
+requires = ["confirm-outage"]
+evidence = "ticket"
+
+[[steps]]
+id = "contact-vendor"
+phase = "assess"
+role = "vendor-manager"
+action = "Open a case with the vendor and record the commitment they give."
+due = { sev1 = 60, sev2 = 240, sev3 = 960, sev4 = 2880 }
+requires = ["confirm-outage"]
+evidence = "ticket"
+
+[[steps]]
+id = "status-update"
+phase = "notify"
+role = "comms-lead"
+action = "Post a status update for customers and internal users."
+due = { sev1 = 120, sev2 = 480, sev3 = 1440, sev4 = 4320 }
+requires = ["confirm-outage"]
+evidence = "link"
+
+[[steps]]
+id = "restore-primary"
+phase = "recover"
+role = "engineering-lead"
+action = "Return to the primary provider after checking quality and cost against the baseline."
+due = { sev1 = 2880, sev2 = 10080, sev3 = 20160, sev4 = 43200 }
+requires = ["switch-to-fallback"]
+evidence = "ticket"
+
+[[steps]]
+id = "post-incident-review"
+phase = "review"
+role = "incident-commander"
+action = "Hold the review, write down what changes, and assign owners."
+due = { sev1 = 20160, sev2 = 20160, sev3 = 43200, sev4 = 43200 }
+requires = ["restore-primary"]
+evidence = "link"

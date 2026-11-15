@@ -1,0 +1,76 @@
+id = "pb-data-exposure"
+title = "Personal or confidential data exposed by an AI system"
+applies_to = ["data_exposure"]
+
+[[steps]]
+id = "confirm-exposure"
+phase = "detect"
+role = "security-lead"
+action = "Confirm what was exposed, to whom, and whether it is still happening."
+due = { sev1 = 15, sev2 = 60, sev3 = 240, sev4 = 1440 }
+evidence = "log"
+
+[[steps]]
+id = "cut-exposure-path"
+phase = "contain"
+role = "engineering-lead"
+action = "Disable the feature, tool, index or credential that exposes the data."
+due = { sev1 = 20, sev2 = 90, sev3 = 480 }
+requires = ["confirm-exposure"]
+evidence = "ticket"
+
+[[steps]]
+id = "preserve-evidence"
+phase = "contain"
+role = "security-lead"
+action = "Keep prompts, outputs, retrieval logs and access logs before anything rotates."
+due = { sev1 = 60, sev2 = 240, sev3 = 1440 }
+requires = ["confirm-exposure"]
+evidence = "link"
+
+[[steps]]
+id = "scope-affected-data"
+phase = "assess"
+role = "security-lead"
+action = "List the data subjects, fields and time window affected."
+due = { sev1 = 240, sev2 = 720, sev3 = 2880 }
+requires = ["cut-exposure-path"]
+evidence = "text"
+
+[[steps]]
+id = "notify-regulator"
+phase = "notify"
+role = "legal-contact"
+action = "Send the notification your legal team has set for this case."
+due = { sev1 = 2400, sev2 = 2400 }
+requires = ["scope-affected-data"]
+evidence = "text"
+notifies = "ob-regulator-a"
+
+[[steps]]
+id = "notify-affected-people"
+phase = "notify"
+role = "comms-lead"
+action = "Tell the people affected, in the wording legal has approved."
+due = { sev1 = 5400, sev2 = 5400 }
+requires = ["scope-affected-data"]
+evidence = "link"
+notifies = "ob-affected-people"
+
+[[steps]]
+id = "restore-safe-service"
+phase = "recover"
+role = "engineering-lead"
+action = "Bring the service back with the cause removed and a test that would have caught it."
+due = { sev1 = 1440, sev2 = 4320, sev3 = 10080 }
+requires = ["cut-exposure-path"]
+evidence = "ticket"
+
+[[steps]]
+id = "post-incident-review"
+phase = "review"
+role = "incident-commander"
+action = "Hold the review, write down what changes, and assign owners."
+due = { sev1 = 20160, sev2 = 20160, sev3 = 43200, sev4 = 43200 }
+requires = ["restore-safe-service"]
+evidence = "link"

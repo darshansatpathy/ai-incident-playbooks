@@ -1,0 +1,35 @@
+# A scripted rehearsal. Thirty minutes of a personal-data exposure in which the exposure path has
+# not been cut yet. The playbook should say containment is overdue and nothing else is.
+id = "drill-001"
+title = "Slow containment of a data exposure"
+kind = "data_exposure"
+playbook = "pb-data-exposure"
+declared_at = 2026-11-01T10:00:00Z
+aware_at = 2026-11-01T09:50:00Z
+declared_severity = "sev1"
+at = 2026-11-01T10:40:00Z
+note = "The facts say the exposure is still happening, so this is run at sev1."
+
+[facts]
+data_exposed = "personal"
+customer_facing = true
+ongoing = true
+
+[[events]]
+at = 2026-11-01T10:05:00Z
+kind = "ack"
+by = "person-a"
+
+[[events]]
+at = 2026-11-01T10:10:00Z
+step = "confirm-exposure"
+by = "person-b"
+evidence = "log shows the exposed index"
+
+[expect]
+severity = "sev1"
+overdue_steps = ["cut-exposure-path"]
+overdue_obligations = []
+done_steps = ["confirm-exposure"]
+update_overdue = false
+ack_overdue = false

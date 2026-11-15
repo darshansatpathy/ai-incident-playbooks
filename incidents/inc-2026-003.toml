@@ -1,0 +1,30 @@
+# An invented incident. Open and on schedule at the pinned time.
+id = "inc-2026-003"
+title = "Summaries got worse after a prompt change"
+kind = "model_regression"
+playbook = "pb-model-regression"
+declared_at = 2026-11-15T09:00:00Z
+aware_at = 2026-11-15T08:30:00Z
+declared_severity = "sev3"
+status = "open"
+
+[facts]
+customer_facing = true
+harm = "reputational"
+
+[[events]]
+at = 2026-11-15T09:20:00Z
+kind = "ack"
+by = "person-a"
+
+[[events]]
+at = 2026-11-15T09:45:00Z
+step = "confirm-regression"
+by = "person-a"
+evidence = "41 of 200 saved cases now fail the completeness check"
+
+[[events]]
+at = 2026-11-15T10:30:00Z
+step = "roll-back-model"
+by = "person-a"
+evidence = "TICKET-INV-9: prompt v7 rolled back to v6"

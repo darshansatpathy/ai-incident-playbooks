@@ -1,0 +1,79 @@
+# An invented incident. Closed, with every step done.
+id = "inc-2026-001"
+title = "Support assistant quoted another customer's order details"
+kind = "data_exposure"
+playbook = "pb-data-exposure"
+declared_at = 2026-10-05T09:30:00Z
+aware_at = 2026-10-05T09:00:00Z
+declared_severity = "sev2"
+status = "closed"
+
+[facts]
+data_exposed = "personal"
+customer_facing = true
+users_affected = 3
+
+[[events]]
+at = 2026-10-05T09:40:00Z
+kind = "ack"
+by = "person-a"
+
+[[events]]
+at = 2026-10-05T09:50:00Z
+step = "confirm-exposure"
+by = "person-b"
+evidence = "retrieval log shows order index queried without the customer filter"
+
+[[events]]
+at = 2026-10-05T10:35:00Z
+step = "cut-exposure-path"
+by = "person-a"
+evidence = "TICKET-INV-1: order search tool disabled"
+
+[[events]]
+at = 2026-10-05T11:00:00Z
+kind = "update"
+by = "person-a"
+note = "Tool disabled, scope being established."
+
+[[events]]
+at = 2026-10-05T12:30:00Z
+step = "preserve-evidence"
+by = "person-b"
+evidence = "https://example.invalid/evidence/inv-1"
+
+[[events]]
+at = 2026-10-05T13:00:00Z
+kind = "update"
+by = "person-a"
+note = "Three customers affected."
+
+[[events]]
+at = 2026-10-05T18:00:00Z
+step = "scope-affected-data"
+by = "person-b"
+evidence = "three order records, name and delivery address"
+
+[[events]]
+at = 2026-10-06T08:00:00Z
+step = "notify-regulator"
+by = "person-d"
+evidence = "sent under the process legal has set"
+
+[[events]]
+at = 2026-10-07T10:00:00Z
+step = "notify-affected-people"
+by = "person-c"
+evidence = "https://example.invalid/comms/inv-1"
+
+[[events]]
+at = 2026-10-08T15:00:00Z
+step = "restore-safe-service"
+by = "person-a"
+evidence = "TICKET-INV-2: filter enforced in the tool, test added"
+
+[[events]]
+at = 2026-10-12T10:00:00Z
+step = "post-incident-review"
+by = "person-a"
+evidence = "https://example.invalid/reviews/inv-1"

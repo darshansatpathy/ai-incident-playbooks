@@ -1,0 +1,75 @@
+id = "pb-harmful-output"
+title = "An AI system produced harmful output to users"
+applies_to = ["harmful_output"]
+
+[[steps]]
+id = "confirm-harm"
+phase = "detect"
+role = "product-owner"
+action = "Reproduce the output and record what it was and who saw it."
+due = { sev1 = 15, sev2 = 60, sev3 = 240, sev4 = 1440 }
+evidence = "text"
+
+[[steps]]
+id = "restrict-feature"
+phase = "contain"
+role = "engineering-lead"
+action = "Turn off or restrict the feature, or add a block for the failing pattern."
+due = { sev1 = 20, sev2 = 90, sev3 = 480 }
+requires = ["confirm-harm"]
+evidence = "ticket"
+
+[[steps]]
+id = "preserve-examples"
+phase = "contain"
+role = "security-lead"
+action = "Keep the inputs, outputs and configuration that produced it."
+due = { sev1 = 60, sev2 = 240, sev3 = 1440 }
+requires = ["confirm-harm"]
+evidence = "link"
+
+[[steps]]
+id = "assess-reach"
+phase = "assess"
+role = "product-owner"
+action = "Estimate how many people saw it and what happened as a result."
+due = { sev1 = 240, sev2 = 720, sev3 = 2880, sev4 = 4320 }
+requires = ["confirm-harm"]
+evidence = "text"
+
+[[steps]]
+id = "notify-sector-regulator"
+phase = "notify"
+role = "legal-contact"
+action = "Send the notification your legal team has set, if the domain requires one."
+due = { sev1 = 1200, sev2 = 1200 }
+requires = ["assess-reach"]
+evidence = "text"
+notifies = "ob-sector-regulator"
+
+[[steps]]
+id = "customer-statement"
+phase = "notify"
+role = "comms-lead"
+action = "Publish or send the statement legal and the product owner have agreed."
+due = { sev1 = 1440, sev2 = 2880, sev3 = 4320 }
+requires = ["assess-reach"]
+evidence = "link"
+
+[[steps]]
+id = "fix-and-verify"
+phase = "recover"
+role = "engineering-lead"
+action = "Fix the cause and verify against the saved examples before restoring."
+due = { sev1 = 2880, sev2 = 10080, sev3 = 20160, sev4 = 43200 }
+requires = ["restrict-feature"]
+evidence = "ticket"
+
+[[steps]]
+id = "post-incident-review"
+phase = "review"
+role = "incident-commander"
+action = "Hold the review, write down what changes, and assign owners."
+due = { sev1 = 20160, sev2 = 20160, sev3 = 43200, sev4 = 43200 }
+requires = ["fix-and-verify"]
+evidence = "link"

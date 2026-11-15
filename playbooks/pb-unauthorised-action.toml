@@ -1,0 +1,76 @@
+id = "pb-unauthorised-action"
+title = "An AI agent took an action it was not authorised to take"
+applies_to = ["unauthorised_action"]
+
+[[steps]]
+id = "confirm-action"
+phase = "detect"
+role = "security-lead"
+action = "Confirm which actions the agent took, with which credentials, and whether it is still acting."
+due = { sev1 = 15, sev2 = 60, sev3 = 240, sev4 = 1440 }
+evidence = "log"
+
+[[steps]]
+id = "revoke-agent-access"
+phase = "contain"
+role = "engineering-lead"
+action = "Revoke the agent's credentials and disable its tools."
+due = { sev1 = 15, sev2 = 60, sev3 = 240 }
+requires = ["confirm-action"]
+evidence = "ticket"
+
+[[steps]]
+id = "brief-executive"
+phase = "notify"
+role = "incident-commander"
+action = "Brief the executive sponsor with what is known and what is not."
+due = { sev1 = 120, sev2 = 180 }
+requires = ["confirm-action"]
+evidence = "text"
+notifies = "ob-executive-brief"
+
+[[steps]]
+id = "reverse-actions"
+phase = "recover"
+role = "engineering-lead"
+action = "Undo or compensate for the actions, in the order that limits further harm."
+due = { sev1 = 480, sev2 = 1440, sev3 = 4320 }
+requires = ["revoke-agent-access"]
+evidence = "ticket"
+
+[[steps]]
+id = "notify-sector-regulator"
+phase = "notify"
+role = "legal-contact"
+action = "Send the notification your legal team has set, if the domain requires one."
+due = { sev1 = 1200, sev2 = 1200 }
+requires = ["confirm-action"]
+evidence = "text"
+notifies = "ob-sector-regulator"
+
+[[steps]]
+id = "assess-permissions"
+phase = "assess"
+role = "security-lead"
+action = "Work out how the agent came to have the access, and what else it could have done."
+due = { sev1 = 1440, sev2 = 2880, sev3 = 4320, sev4 = 10080 }
+requires = ["revoke-agent-access"]
+evidence = "text"
+
+[[steps]]
+id = "restore-with-limits"
+phase = "recover"
+role = "engineering-lead"
+action = "Restore the agent with narrower permissions and a human confirmation on the action that failed."
+due = { sev1 = 4320, sev2 = 10080, sev3 = 20160, sev4 = 43200 }
+requires = ["reverse-actions", "assess-permissions"]
+evidence = "ticket"
+
+[[steps]]
+id = "post-incident-review"
+phase = "review"
+role = "incident-commander"
+action = "Hold the review, write down what changes, and assign owners."
+due = { sev1 = 20160, sev2 = 20160, sev3 = 43200, sev4 = 43200 }
+requires = ["restore-with-limits"]
+evidence = "link"

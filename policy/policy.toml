@@ -1,0 +1,170 @@
+# An EXAMPLE policy for running AI incidents. Not legal advice. Every notification deadline below
+# is a placeholder to be replaced with the figures your legal team gives you for your jurisdictions
+# and contracts. The people are synthetic.
+
+phases = ["detect", "contain", "assess", "notify", "recover", "review"]
+required_phases = ["contain", "review"]
+kinds = ["data_exposure", "harmful_output", "unauthorised_action", "model_regression", "vendor_outage"]
+
+# The first containment step must be due within this many minutes of declaration, at these levels.
+[contain_within_minutes]
+sev1 = 30
+sev2 = 120
+
+[[levels]]
+name = "sev1"
+ack_minutes = 15
+update_minutes = 60
+
+[[levels]]
+name = "sev2"
+ack_minutes = 30
+update_minutes = 120
+
+[[levels]]
+name = "sev3"
+ack_minutes = 120
+update_minutes = 480
+
+[[levels]]
+name = "sev4"
+ack_minutes = 480
+update_minutes = 1440
+
+# The most severe level any rule gives wins. With no match the least severe level applies.
+[[severity_rules]]
+level = "sev1"
+because = "Physical harm is possible"
+when = { harm_in = ["physical"] }
+
+[[severity_rules]]
+level = "sev1"
+because = "Personal or confidential data is exposed and the exposure is still happening"
+when = { data_exposed_in = ["personal", "confidential"], ongoing = true }
+
+[[severity_rules]]
+level = "sev1"
+because = "An agent took actions of its own and money or people were harmed"
+when = { autonomous_action = true, harm_in = ["financial", "physical"] }
+
+[[severity_rules]]
+level = "sev2"
+because = "Personal or confidential data was exposed"
+when = { data_exposed_in = ["personal", "confidential"] }
+
+[[severity_rules]]
+level = "sev2"
+because = "A large number of people are affected"
+when = { users_affected_min = 1000 }
+
+[[severity_rules]]
+level = "sev2"
+because = "An agent took actions of its own"
+when = { autonomous_action = true }
+
+[[severity_rules]]
+level = "sev2"
+because = "Financial harm occurred"
+when = { harm_in = ["financial"] }
+
+[[severity_rules]]
+level = "sev3"
+because = "Customers saw the problem and it caused reputational harm"
+when = { customer_facing = true, harm_in = ["reputational"] }
+
+[[severity_rules]]
+level = "sev3"
+because = "Internal data was exposed"
+when = { data_exposed_in = ["internal"] }
+
+[roles.incident-commander]
+backup = "engineering-lead"
+
+[roles.engineering-lead]
+backup = "security-lead"
+
+[roles.security-lead]
+backup = "executive-sponsor"
+
+[roles.comms-lead]
+backup = "product-owner"
+
+[roles.product-owner]
+backup = "executive-sponsor"
+
+[roles.legal-contact]
+backup = "executive-sponsor"
+
+[roles.vendor-manager]
+backup = "product-owner"
+
+[roles.executive-sponsor]
+final = true
+
+[people.person-a]
+roles = ["incident-commander", "engineering-lead"]
+
+[people.person-b]
+roles = ["security-lead"]
+
+[people.person-c]
+roles = ["comms-lead", "product-owner"]
+
+[people.person-d]
+roles = ["legal-contact"]
+
+[people.person-e]
+roles = ["vendor-manager"]
+
+[people.person-f]
+roles = ["executive-sponsor"]
+
+# Notification clocks. `example = true` marks a placeholder. `kind = "legal"` obligations need a
+# source, a reviewer and a review date once they are not placeholders.
+[[obligations]]
+id = "ob-regulator-a"
+kind = "legal"
+audience = "Regulator A (placeholder: name the regulator that applies to you)"
+when = { data_exposed_in = ["personal"] }
+clock_from = "aware"
+deadline_hours = 48
+example = true
+source = ""
+reviewed_by = ""
+reviewed_on = ""
+
+[[obligations]]
+id = "ob-affected-people"
+kind = "legal"
+audience = "Affected people (placeholder: the rules and contracts that apply to you)"
+when = { data_exposed_in = ["personal", "confidential"], customer_facing = true }
+clock_from = "aware"
+deadline_hours = 96
+example = true
+source = ""
+reviewed_by = ""
+reviewed_on = ""
+
+[[obligations]]
+id = "ob-sector-regulator"
+kind = "legal"
+audience = "Sector regulator (placeholder: only if you are in a regulated domain)"
+when = { regulated_domain = true, harm_in = ["financial", "physical"] }
+clock_from = "aware"
+deadline_hours = 24
+example = true
+source = ""
+reviewed_by = ""
+reviewed_on = ""
+
+[[obligations]]
+id = "ob-executive-brief"
+kind = "internal"
+audience = "Executive sponsor"
+when = { autonomous_action = true }
+clock_from = "declared"
+deadline_hours = 4
+example = false
+source = ""
+reviewed_by = ""
+reviewed_on = ""

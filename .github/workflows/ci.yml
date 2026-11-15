@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Lint, types, tests (Python ${{ matrix.python }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Ruff lint
+        run: ruff check .
+      - name: Ruff format
+        run: ruff format --check .
+      - name: Mypy (strict)
+        run: mypy
+      - name: Tests with coverage
+        run: pytest --cov=playbooks --cov-report=term-missing --cov-fail-under=85
+
+  example:
+    name: Example playbooks, drills and generated files
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: pip install -e .
+      - name: Lint the policy, playbooks and incidents
+        shell: bash
+        run: aip lint --fail-on high --now 2026-11-15T12:00:00Z --format markdown | tee lint.md
+      - name: Publish summary
+        if: always()
+        run: cat lint.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Drills give the expected state
+        run: aip drill
+      - name: Reports are current
+        run: aip report --now 2026-11-15T12:00:00Z --check
+
+  package:
+    name: Wheel installs and runs on its own
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Build
+        run: |
+          pip install build
+          python -m build --wheel
+      - name: Install the wheel into a clean environment and run it on a copy of the example
+        run: |
+          python -m venv /tmp/clean
+          /tmp/clean/bin/pip install dist/*.whl
+          mkdir /tmp/work
+          cp -r playbooks policy incidents drills /tmp/work/
+          cd "$(mktemp -d)"
+          /tmp/clean/bin/aip --version
+          /tmp/clean/bin/aip lint --root /tmp/work --now 2026-11-15T12:00:00Z
+          /tmp/clean/bin/aip drill --root /tmp/work
+
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: pip install -e . pip-audit
+      - name: pip-audit
+        run: pip-audit --skip-editable

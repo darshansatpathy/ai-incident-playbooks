@@ -1,0 +1,49 @@
+# An invented incident. Open, with a late update and a step past its deadline.
+id = "inc-2026-002"
+title = "Procurement agent placed purchase orders above its limit"
+kind = "unauthorised_action"
+playbook = "pb-unauthorised-action"
+declared_at = 2026-11-14T08:00:00Z
+aware_at = 2026-11-14T07:45:00Z
+declared_severity = "sev1"
+status = "open"
+
+[facts]
+autonomous_action = true
+harm = "financial"
+users_affected = 1
+
+[[events]]
+at = 2026-11-14T08:10:00Z
+kind = "ack"
+by = "person-a"
+
+[[events]]
+at = 2026-11-14T08:30:00Z
+step = "confirm-action"
+by = "person-b"
+evidence = "agent log: 14 orders over the approval limit"
+
+[[events]]
+at = 2026-11-14T08:50:00Z
+step = "revoke-agent-access"
+by = "person-a"
+evidence = "TICKET-INV-7: agent credentials revoked"
+
+[[events]]
+at = 2026-11-14T09:30:00Z
+step = "brief-executive"
+by = "person-a"
+evidence = "briefed the sponsor in person"
+
+[[events]]
+at = 2026-11-14T10:00:00Z
+kind = "update"
+by = "person-a"
+note = "Credentials revoked; reversing orders."
+
+[[events]]
+at = 2026-11-14T18:00:00Z
+step = "reverse-actions"
+by = "person-a"
+evidence = "TICKET-INV-8: 11 of 14 orders cancelled"

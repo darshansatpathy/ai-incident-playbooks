@@ -1,0 +1,56 @@
+id = "pb-model-regression"
+title = "A model or prompt change made the system worse"
+applies_to = ["model_regression"]
+
+[[steps]]
+id = "confirm-regression"
+phase = "detect"
+role = "engineering-lead"
+action = "Show the regression on a saved set of cases, with the before and after."
+due = { sev1 = 15, sev2 = 60, sev3 = 240, sev4 = 1440 }
+evidence = "log"
+
+[[steps]]
+id = "roll-back-model"
+phase = "contain"
+role = "engineering-lead"
+action = "Roll back to the last version that passed the checks."
+due = { sev1 = 25, sev2 = 100, sev3 = 480, sev4 = 2880 }
+requires = ["confirm-regression"]
+evidence = "ticket"
+
+[[steps]]
+id = "assess-impact"
+phase = "assess"
+role = "product-owner"
+action = "Estimate which users and decisions were affected between the change and the roll-back."
+due = { sev1 = 480, sev2 = 1440, sev3 = 4320, sev4 = 10080 }
+requires = ["confirm-regression"]
+evidence = "text"
+
+[[steps]]
+id = "tell-affected-teams"
+phase = "notify"
+role = "comms-lead"
+action = "Tell the teams and customers who relied on the affected outputs."
+due = { sev1 = 600, sev2 = 1500, sev3 = 4500, sev4 = 10500 }
+requires = ["assess-impact"]
+evidence = "link"
+
+[[steps]]
+id = "add-regression-test"
+phase = "recover"
+role = "engineering-lead"
+action = "Add the failing cases to the release checks so the change cannot ship again unnoticed."
+due = { sev1 = 10080, sev2 = 20160, sev3 = 43200, sev4 = 43200 }
+requires = ["roll-back-model"]
+evidence = "ticket"
+
+[[steps]]
+id = "post-incident-review"
+phase = "review"
+role = "incident-commander"
+action = "Hold the review, write down what changes, and assign owners."
+due = { sev1 = 20160, sev2 = 20160, sev3 = 43200, sev4 = 43200 }
+requires = ["add-regression-test"]
+evidence = "link"
